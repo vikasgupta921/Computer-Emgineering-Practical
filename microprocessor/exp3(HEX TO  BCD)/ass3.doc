@@ -1,0 +1,216 @@
+section .data
+
+	ano db "******MENU******",10
+		an0_len equ $-ano 
+
+	ano1 db "----------------------",10
+		an1_len equ $-ano1
+
+	num db "enter number",10
+		num_len equ $-num
+
+	num1 db "Answer is",10
+		num_is equ $-num1
+	
+	menu 	db " ",10
+		db "1.Hex to BCD",10
+	     	db "2.BCD to Hex",10
+	     	db "3.Exit",10
+	     	db "Enter your choice:",10
+	menu_len equ $-menu
+
+	error1 db "Error",10
+		err_len equ $-error1
+	
+%macro read 2
+		mov rax,0
+		mov rdi,0
+		mov rsi,%1
+		mov rdx,%2
+		syscall
+%endmacro
+
+%macro print 2
+              mov rax,1
+              mov rdi,1
+              mov rsi,%1
+              mov rdx,%2
+              syscall
+%endmacro
+
+%macro exit 0
+              mov rax,60
+              mov rbx,00
+	 syscall
+%endmacro
+
+section .bss
+	char_ans resb 1
+	buf resb 5
+
+
+section .text
+global _start
+_start:	
+	print ano,an0_len
+	print ano1,an1_len
+	
+menu1: print menu,menu_len
+	read buf,2
+	mov al,[buf]
+c1:	cmp al,'1'
+	jne c2
+	call hex_bcd
+	jmp menu1
+c2:	cmp al,'2'
+	jne c3
+	call bcd_hex
+	jmp menu1
+c3:	cmp al,'3'
+	jne invalid
+exit
+invalid:print error1,err_len
+	jmp menu1
+
+hex_bcd:
+	print num,num_len
+	call accept_16
+	mov ax,bx
+
+	mov bx,10
+	xor bp,bp
+	
+back:
+	xor dx,dx
+	div bx
+	push dx
+	inc bp
+	cmp ax,0
+	jne back
+	print num1,num_is
+
+back1:
+	pop dx
+	add dl,30h
+	mov [char_ans],dl
+	print char_ans,1
+	dec bp
+	jnz back1
+RET
+
+accept_16:
+		read buf,5
+		mov rcx,4
+		mov rsi,buf
+		xor bx,bx
+next_byte:
+		SHL bx,4
+		mov al,[rsi]
+		
+		cmp  al,'0'
+		jb error
+		cmp al,'9'
+		jbe sub30
+
+		cmp al,'A'
+		jb error
+		cmp al,'F'
+		jbe sub37
+
+		cmp al,'a'
+		jb error
+		cmp al,'f'
+		jbe sub57
+
+sub57:sub al,20h
+sub37:sub al,07h
+sub30:sub al,30h
+
+		add bx,ax
+		inc rsi
+		dec rcx
+		jnz next_byte
+ret
+
+bcd_hex:
+	print num,num_len
+	read buf,5
+	mov rsi,buf
+	xor ax,ax
+	mov rbp,4
+	mov rbx,10
+
+next:
+	xor rcx,rcx
+	mul bx
+	mov cl,[rsi]
+	sub cl,30h
+	add ax,cx
+	inc rsi
+	dec rbp
+	jnz next
+	mov [char_ans],ax
+	print num1,num_is
+	mov ax,[char_ans]
+	call display_16
+ret
+
+display_16:
+
+               mov  rsi,char_ans+3
+               mov  rcx,4 ;COUNTER
+               mov rbx,16
+ 
+ back2:
+              xor rdx,rdx
+              div rbx
+
+              cmp dl,9h
+              jbe add30
+
+              add dl,07h
+ add30:
+
+              add dl,30h
+
+              mov[rsi],dl
+
+              dec rsi
+              dec rcx
+              jnz back2
+              print char_ans,4
+ret
+
+
+error:
+	print error1,err_len
+exit
+
+
+;******MENU******
+;----------------------
+ 
+;1.Hex to BCD
+;2.BCD to Hex
+;3.Exit
+;Enter your choice:
+;1
+;enter number
+;000A
+;Answer is
+;10 
+;1.Hex to BCD
+;2.BCD to Hex
+;3.Exit
+;Enter your choice:
+;2
+;enter number
+;0010
+;Answer is
+;000A 
+;1.Hex to BCD
+;2.BCD to Hex
+;3.Exit
+;Enter your choice:
+;3
+

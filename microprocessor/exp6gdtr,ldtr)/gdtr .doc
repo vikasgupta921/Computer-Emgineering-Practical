@@ -1,0 +1,164 @@
+section .data
+
+nline db 10,10
+nline_len : equ $-nline
+colon db ":"
+
+rmsg db 10,'Processor in real mode....'
+rmsg_len: equ $-rmsg
+
+pmsg  db 10,'Processor in protected mode...'
+pmsg_len:  equ  $-pmsg
+ 
+gmsg db 10,"GDTR(Global descriptor table register)"
+gmsg_len: equ $-gmsg
+
+imsg db 10,"IDTR(interrupt descriptor table register)"
+imsg_len: equ $-imsg
+
+lmsg db 10,"LDTR(Local descriptor table register)"
+lmsg_len: equ $-lmsg
+
+tmsg db 10,"TR(Tasl register)"
+tsmg_len: equ $-tmsg
+
+mmsg db 10,"MSW:"
+mmsg_len: equ $-mmsg
+
+;----------------------------------------------------------------------
+
+section .bss
+
+GDTR resw 3
+IDTR resw 3
+LDTR resw 1
+TR resw 1
+MSW resw 1
+char_sum resb 4
+
+;-------------------------------------------------------------------------
+
+%macro print 2
+mov eax,4
+mov ebx,1
+mov ecx,%1
+mov edx,%2
+int 80h
+%endmacro
+
+%macro exit 0
+mov eax,1
+mov ebx,0
+int 80h
+%endmacro
+
+;----------------------------------------------------------------------------
+
+section .text
+global _start
+_start:
+        SMSW[MSW]
+	mov rax,[MSW]
+	bt rax,0
+	jc p_mode
+	print rmsg,rmsg_len
+	jmp next
+p_mode:
+	print pmsg,pmsg_len
+	next: SGDT[GDTR]
+	SIDT[IDTR]
+	SLDT[LDTR]
+	STR[TR]
+
+print gmsg,gmsg_len
+	mov ax,[GDTR+4]
+
+	call disp16_proc
+	mov ax,[GDTR+2]
+	call disp16_proc
+	print colon,1
+	mov ax,[GDTR+0]
+	call disp16_proc
+
+print imsg,imsg_len
+	mov ax,[IDTR+4]
+
+	call disp16_proc
+	mov ax,[IDTR+2]
+	call disp16_proc
+	print colon,1
+	mov ax,[IDTR+0]
+	call disp16_proc
+
+print lmsg,lmsg_len
+	mov ax,[LDTR+4]
+
+	call disp16_proc
+	mov ax,[LDTR+2]
+	call disp16_proc
+	print colon,1
+	mov ax,[LDTR+0]
+	call disp16_proc
+
+print tmsg,tsmg_len
+	mov ax,[TR]
+	call disp16_proc
+
+print mmsg,mmsg_len
+	mov ax,[MSW]
+	call disp16_proc
+
+print  nline,nline_len
+exit
+
+;------------------------------------------------
+
+;disp16_proc:
+;	mov rsi,char_sum+3
+;	mov rcx,4
+;	cnt:mov rdx,0
+;	mov rbx,16
+;	div rbx
+;	cmp dl,09h
+;	jbe add30
+;	add dl,07h
+;add30:
+;	add d1,30h
+;	mov [rsi],d1
+;	dec rsi
+;	dec rcx
+;	jnz cnt
+;print char_sum,4
+;ret
+
+disp16_proc:
+
+	mov rsi,char_sum
+	mov rcx,4
+	cnt:rol ax,4
+	mov dl,al
+	and dl,0fh
+	add dl,30h
+	cmp dl,39h
+	jbe disp
+	add dl,07h
+
+disp:
+ mov [rsi],dl
+ inc rsi
+loop cnt
+print char_sum,4
+ret
+ 
+
+;-------------------------------------------
+;output:
+;Processor in protected mode...
+;GDTR(Global descriptor table register)6ED09000:007F
+;IDTR(interrupt descriptor table register)FF578000:0FFF
+;LDTR(Local descriptor table register)00330040:0000
+;TR(Tasl register)0040
+;MSW:0033
+
+
+

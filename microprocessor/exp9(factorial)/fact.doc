@@ -1,0 +1,105 @@
+﻿%macro cmn 4			 
+	mov rax,%1 
+	mov rdi,%2 
+	mov rsi,%3 
+	mov rdx,%4 
+	syscall 
+%endmacro 
+section .data 
+	 
+	msg db "Factorial is : " 
+	msglen equ $-msg 
+	msg1 db "*****Program to find Factorial of a number***** ",0Ah 
+		 db "Enter the number : ", 
+	msg1len equ $-msg1 
+	 
+	zerofact db " 00000001 " 
+	zerofactlen equ $-zerofact 
+
+section .bss 
+	dispnum resb 16 
+	result resb 4 
+	temp resb 3 
+       num resb 1 
+section .text 
+global _start 
+_start: 
+	 
+	cmn 1,1,msg1,msg1len 
+	cmn 0,0,temp,3		 
+	call convert			   
+	mov [num],bl 
+	 
+	cmn 1,1,msg,msglen 
+
+
+	mov al,[num]		 
+	cmp al,01h			 
+	jbe endfact 
+	 
+	mov bl,[num] 
+	call factr 
+mov rbx,rax		 
+	call disp64_proc 
+
+	jmp exit 
+endfact: 
+	cmn 1,1,zerofact,zerofactlen 
+exit:mov rax,60 
+mov rdi,0 
+syscall 
+ret 
+
+convert: 
+mov bx,0 
+mov rcx,02 
+mov rsi,temp 
+up1: rol bl,04 
+mov al,[rsi] 
+cmp al,39h 
+jbe skip1 
+sub al,07h 
+skip1: 
+sub al,30h 
+add bl,al 
+inc rsi 
+loop up1 
+ret 
+
+factr: cmp bl,1 
+jne do_cal 
+mov ax,1 
+ret 
+do_cal: push rbx 
+dec bl 
+call factr 
+pop rbx 
+mul bl 
+ret 
+
+disp64_proc: 
+mov rdi,dispnum 
+mov rcx,16 
+dispup1: 
+rol rbx,4 
+mov dl,bl 
+and dl,0fh 
+add dl,30h 
+cmp dl,39h 
+jbe dispskip1 
+add dl,07h 
+dispskip1: 
+mov [rdi],dl 
+inc  rdi 
+loop dispup1 
+cmn 1,1,dispnum,16 
+ret 
+
+;output:
+;root1@root1-OptiPlex-380:~$ nasm -felf64 mp55.asm 
+;root1@root1-OptiPlex-380:~$ ld mp55.o 
+;root1@root1-OptiPlex-380:~$ ./a.out 
+;*****Program to find Factorial of a number***** 
+;Enter the number : 05 
+;Factorial is : 0000000000000078	
+
