@@ -1,0 +1,92 @@
+//#include<stdio.h>
+//#include<conio.h>
+#include<iostream>
+using namespace std;
+//#include<stdlib.h>
+#include<math.h>
+//#include<dos.h>
+#include<graphics.h>
+void cirbresen(int x,int y,int r);
+void dda(int x1,int y1,int x2,int y2);
+void display(int,int,int,int);
+int main()
+{
+ int gd=DETECT,gm,x,y,r;
+ initgraph(&gd,&gm,NULL);
+ cleardevice();
+ cout<<"\n HOME";
+ cirbresen(151,165,16);
+ dda(150,110,210,210);
+ dda(150,110,96,213);
+ dda(96,213,350,210);
+ dda(150,110,300,110);
+ dda(300,110,350,210);
+ dda(96,213,96,405);
+ dda(210,210,211,405);
+ dda(350,210,350,405);
+ dda(96,405,350,405);
+ dda(305,325,305,405);
+ dda(270,325,270,405);
+ dda(270,325,305,325);
+delay(5000);
+return 0;
+  getch();
+ closegraph();
+ }
+ void cirbresen(int x,int y,int r)
+ {
+   float s;
+   int x1,y1;
+   x1=0,y1=r;
+   s=3-2*r;
+   while(x1<=y1)
+   {
+	if(s<=0)
+	 s+=4*x1+6;
+	else
+	{
+	 s+=4*(x1-y1)+10;
+	 y1--;
+	}
+	x1++;
+	display(x1,y1,x,y);
+	}
+ }
+	void display(int x1,int y1,int x,int y)
+	{
+	  putpixel(x1+x,y1+y,WHITE);
+	  putpixel(x1+x,y-y1,WHITE);
+	  putpixel(x-x1,y1+y,WHITE);
+	  putpixel(x-x1,y-y1,WHITE);
+	  putpixel(x+y1,y+x1,WHITE);
+	  putpixel(x+y1,y-x1,WHITE);
+	  putpixel(x-y1,y+x1,WHITE);
+	  putpixel(x-y1,y-x1,WHITE);
+	}
+
+ void dda(int x1,int y1,int x2,int y2)
+ {
+   int i,dx,dy,steps;
+   float x,y;
+   float xinc,yinc;
+   dx=x2-x1;
+   dy=y2-y1;
+   if(abs(dx)>=abs(dy))
+	  steps=dx;
+   else
+	  steps=dy;
+   xinc=(float)dx/steps;
+   yinc=(float)dy/steps;
+   x=x1;
+   y=y1;
+   putpixel(x,y,WHITE);
+   for(i=1;i<=steps;i++)
+   {
+	x=x+xinc;
+	y=y+yinc;
+	x1=x+0.5;
+	y1=y+0.5;
+	putpixel(x1,y1,WHITE);
+   }
+  }
+
