@@ -1,0 +1,68 @@
+/*<html>
+<body>
+<applet code="Pendulum.class" width=100 height=100></applet>
+</body>
+</html>*/
+
+import java.applet.*;
+import  java.awt.*;
+
+public class Pendulum extends Applet implements Runnable
+{
+private static final long serailVersionUID=1l;
+Thread t;
+int xl=420,x1=440,xl1=440;
+int yl=410,y1=400,yl1=300;
+
+public void start()
+{
+t=new Thread(this);
+t.start();
+}
+public void paint(Graphics g)
+{
+g.drawOval(400,200,100,100);
+g.drawString("12",445,212);
+g.drawString("9",402,253);
+g.drawString("6",445,298);
+g.drawString("3",490,253);
+g.drawLine(450,250,450,210);
+g.drawLine(450,250,480,250);
+g.fillOval(x1,y1,20,20);
+g.drawLine(x1,y1,xl1,yl1);
+g.drawLine(x1+15,y1,xl1+15,yl1);
+g.drawLine(420,292,420,440);
+g.drawLine(475,292,475,440);
+g.drawLine(420,440,475,440);
+}
+public void run()
+{
+try
+{
+for(;;)
+{
+for(;;)
+{
+if(x1>=470)
+{
+x1=365;
+x1=365;
+}
+else
+{
+x1=x1+30;
+x1=x1+30;
+Thread.sleep(1000);
+repaint();
+}
+run();
+}
+}
+}
+catch(InterruptedException e)
+{
+}
+}
+}
+
+

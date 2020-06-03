@@ -1,0 +1,47 @@
+#include<iostream>
+#include<graphics.h>
+using namespace std;
+int main(){
+		 int gd=DETECT,gm;
+		float Dx,Dy,x1,y1,x2,y2,x,y,i,len,pk,x3,y3;
+		cout<<"\nEnter the coordinates of x1 and y1";
+		cin>>x1>>y1;
+		cout<<"\nEnter the coordinates of x2 and y2";
+		cin>>x2>>y2;
+		initgraph(&gd,&gm,NULL);
+		putpixel(x,y,RED);
+		Dx=x2-x1;
+		Dy=y2-y1;
+		if(Dx>Dy)
+			len=Dx;
+		else
+			len=Dy;
+
+		pk=2*Dy-Dx;
+
+		while(len!=0)
+		{
+			if(pk>=0)
+			{
+				x1=x1+1;
+				y1=y1+1;
+			}
+			else
+			{
+				x1=x1+1;
+			}
+			
+		putpixel(x1+1,y1+1,RED);
+		cout<<"\nX and Y"<<x1<<x2;
+		pk=pk+(2*Dy)-(2*Dx)*((y1+1)-y1);
+		x1=x1+1;
+		y1=y1+1;
+		len--;
+		}
+		closegraph();
+		delay(7000);
+		return 0;
+}								
+					
+		
+			

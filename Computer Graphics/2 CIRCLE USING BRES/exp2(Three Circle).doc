@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <graphics.h>
+#include<iostream>
+
+using namespace std;
+// Function to put pixels 
+void drawCircle(int xc, int yc, int x, int y)
+{
+    putpixel(xc+x, yc+y, WHITE);
+    putpixel(xc-x, yc+y, WHITE);
+    putpixel(xc+x, yc-y, WHITE);
+    putpixel(xc-x, yc-y, WHITE);
+    putpixel(xc+y, yc+x, WHITE);
+    putpixel(xc-y, yc+x, WHITE);
+    putpixel(xc+y, yc-x, WHITE);
+    putpixel(xc-y, yc-x, WHITE);
+}
+ 
+// Function for circle-generation
+void circleBres(int xc, int yc, int r)
+{
+    int x = 0, y = r;
+    int d = 3 - 2 * r;
+    while (y >= x)
+    {
+       
+        // draw all eight pixels
+        drawCircle(xc, yc, x, y);
+        x++;
+ 
+        // check for decision parameter
+        if (d > 0)
+        {
+            y--; 
+            d = d + 4 * (x - y) + 10;
+        }
+        else
+            d = d + 4 * x + 6;
+        drawCircle(xc, yc, x, y);
+        delay(50);
+    }
+}
+ 
+// driver function
+int main()
+{
+    int xc = 50, yc = 50, r2 = 30;
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm,NULL);  // initialize graph
+
+cout<<"\n Enter x: "; cin>>xc;
+cout<<"\n Enter y: "; cin>>yc;
+cout<<"\n Enter radius: "; cin>>r2;
+	circleBres(xc, yc, r2); 
+
+cout<<"\n Enter x: "; cin>>xc;
+cout<<"\n Enter y: "; cin>>yc;
+cout<<"\n Enter radius: "; cin>>r2;
+	circleBres(xc, yc, r2); 
+
+cout<<"\n Enter x: "; cin>>xc;
+cout<<"\n Enter y: "; cin>>yc;
+cout<<"\n Enter radius: "; cin>>r2;
+	circleBres(xc, yc, r2);   // function call
+     delay(3000);
+      getch();
+    closegraph();
+    return 0;
+}
+
+
+/*
+OUTPUT:-
+ Enter x: 50
+
+ Enter y: 50
+
+ Enter radius: 30
+
+ Enter x: 80
+
+ Enter y: 50
+
+ Enter radius: 30
+
+ Enter x: 110
+
+ Enter y: 50
+
+ Enter radius: 30*/
+
